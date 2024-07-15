@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+package ticketservice;
+
+option go_package = "github.com/vijayakanth89/grpc-ticket-service/ticketservice";
+
+service TimeService {
+  // API to purchase the ticket, User's allocated seatNo will be sent in response.
+  rpc TicketPurchaseService (PurchaseRequestMsg) returns (TicketPurchaseResMsg);
+
+  rpc GetReceipt (Tickets) returns (TicketPurchaseResMsg);
+
+  rpc AllocationStatus(AllocationStatusRequest) returns (AllocationStatusResponse) ; 
+
+  rpc CancelTicket(CancelTicketRequest) returns (CancelTicketResponse) ; 
+
+  rpc GetAllTickets(DummyMessage) returns (TicketsMinListRes) ; 
+
+  rpc SeatReallocate(TicketEntry) returns (TicketReallocResMsg) ;
+}
+
+message TicketReallocResMsg {
+  string newSeatNo = 1 ; 
+  string oldSeatNo = 2; 
+  string ticketNo = 3; 
+}
+
+message DummyMessage {
+  
+}
+
+message TicketsMinListRes {
+  repeated TicketEntry tickets = 1;
+}
+
+message TicketEntry {
+  string ticketNo = 1; 
+  string userId = 2 ; 
+  string seatNumber =3 ; 
+  string section = 4; 
+}
+
+
+message CancelTicketRequest {
+  string ticketNo = 1; 
+  string userId = 2 ;  
+}
+
+message CancelTicketResponse {
+  string status = 1 ; 
+}
+
+
+message AllocationStatusResponse {
+  string trainNo = 2; 
+  string section = 3; 
+  repeated SeatEntry entries = 1;
+}
+
+message SeatEntry {
+    string seat_number = 1;
+    User user_info = 2;
+}
+
+
+message AllocationStatusRequest {
+  string trainNo = 1; 
+  string section  =2; 
+}
+
+message User {
+  string userId = 1 ;
+  string email = 2; 
+}
+
+message Tickets {
+  string userId = 1;
+  string ticketNo = 2 ; 
+}
+
+message TimeRequest {
+  string name = 1 ; 
+}
+
+message TimeResponse {
+  string current_time = 1;
+}
+
+message PurchaseRequestMsg{
+  string firstName = 1;
+  string lastName = 2 ;
+  string email = 3;
+  string trainNo = 4;
+}
+
+message TicketPurchaseResMsg {
+  string firstName = 1;
+  string lastName = 2;
+  string email = 3;
+  string trainNo = 4;
+  string section = 5;
+  string seatNo = 6;
+  string error = 7;
+  string ticketNo = 8 ;
+  string from =  9; 
+  string to = 10;
+  string price = 11 ; 
+}
