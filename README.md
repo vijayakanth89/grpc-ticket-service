@@ -1,7 +1,5 @@
 # grpc-ticket-service
 
-challenge
-
 #datastore, package is to manage all the data related to 
 
   -> users
