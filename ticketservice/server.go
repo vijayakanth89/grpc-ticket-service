@@ -19,70 +19,36 @@ type TicketServer struct {
 
 func (s *TicketServer) SeatReallocate(ctx context.Context, in *TicketEntry) (*TicketReallocResMsg, error) {
 
-	ticket, exists := db.Tickets.Map[in.TicketNo]
+	ticket, err := db.Tickets.Exists(in.TicketNo)
 
-	if !exists {
-		return &TicketReallocResMsg{}, errors.New(fmt.Sprintf("ticket %s not found", in.TicketNo))
+	oldSeatNumber := ticket.GetSeatNumber()
+
+	if err != nil {
+		return &TicketReallocResMsg{}, err
 	}
 
-	var allo1, allo2 *db.Allocations
-	var newSeatNo int
-	var err1 error
-	var newSection string
+	err1 := ticket.SeatReallocate()
 
-	if ticket.Section == "A" {
-		allo1 = &ticket.TrainObj.SectionA
-		allo2 = &ticket.TrainObj.SectionB
-	} else if ticket.Section == "B" {
-		allo1 = &ticket.TrainObj.SectionB
-		allo2 = &ticket.TrainObj.SectionA
-	} else {
-		return &TicketReallocResMsg{}, errors.New(fmt.Sprintf("invalid section: %s", ticket.Section))
+	if err1 != nil {
+		return &TicketReallocResMsg{}, err1
 	}
 
-	newSeatNo, newSection, err1 = allo1.FindNewSeat()
-
-	if newSeatNo == 0 || err1 != nil {
-		newSeatNo, newSection, err1 = allo2.FindNewSeat()
-	} else {
-		if newSeatNo == 0 || err1 != nil {
-			return &TicketReallocResMsg{}, errors.New(db.ERROR_NO_SEATS)
-		}
-	}
-
-	res := TicketReallocResMsg{NewSeatNo: strconv.Itoa(newSeatNo), OldSeatNo: strconv.Itoa(ticket.SeatNo)}
-
-	ticket.Section = newSection
-	ticket.SeatNo = newSeatNo
-
-	return &res, nil
+	return &TicketReallocResMsg{NewSeatNo: ticket.GetSeatNumber(), OldSeatNo: oldSeatNumber}, nil
 }
 
 func (s *TicketServer) CancelTicket(ctx context.Context, in *CancelTicketRequest) (*CancelTicketResponse, error) {
-	ticket, exists := db.Tickets.Map[in.TicketNo]
+	ticket, err := db.Tickets.Exists(in.TicketNo)
 
-	fmt.Printf("%#v\n", ticket)
-
-	if !exists || ticket == nil {
-		return &CancelTicketResponse{Status: "F"}, errors.New("Invalid Ticket No")
+	if err != nil {
+		return &CancelTicketResponse{Status: "F"}, err
 	}
 
-	var alloc *db.Allocations
+	err = ticket.Cancel()
 
-	if ticket.Section == "A" {
-		fmt.Println("comng in section A")
-		alloc = &ticket.TrainObj.SectionA
-
-		for k, v := range alloc.M {
-			fmt.Printf("k:%s,v:%s\n", k, v)
-		}
-	} else if ticket.Section == "B" {
-		alloc = &ticket.TrainObj.SectionB
-	} else {
-		return &CancelTicketResponse{Status: "F"}, errors.New(fmt.Sprintf(("Invalid section: %s"), ticket.Section))
+	if err != nil {
+		return &CancelTicketResponse{Status: "F"}, err
 	}
 
-	alloc.M[ticket.SeatNo] = "0"
 	delete(db.Tickets.Map, ticket.Number)
 
 	return &CancelTicketResponse{Status: "S"}, nil
@@ -174,6 +140,7 @@ func (s *TicketServer) GetAllTickets(ctx context.Context, in *DummyMessage) (*Ti
 	return &res, nil
 
 }
+
 func (s *TicketServer) GetReceipt(ctx context.Context, in *Tickets) (*TicketPurchaseResMsg, error) {
 
 	ticket, exists := db.Tickets.Map[in.TicketNo]

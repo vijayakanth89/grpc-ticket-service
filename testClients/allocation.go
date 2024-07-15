@@ -1,4 +1,4 @@
-package client
+package main
 
 import (
 	"context"
@@ -39,9 +39,9 @@ func main() {
 		log.Println(err4)
 	}
 
-	alltickets, _ := c.GetAllTickets(ctx, &pb.DummyMessage{})
+	// alltickets, _ := c.GetAllTickets(ctx, &pb.DummyMessage{})
 
-	prettyJSONAllticket, _ := json.MarshalIndent(alltickets, "", "  ")
+	// prettyJSONAllticket, _ := json.MarshalIndent(alltickets, "", "  ")
 
-	log.Println(string(prettyJSONAllticket))
+	// log.Println(string(prettyJSONAllticket))
 }

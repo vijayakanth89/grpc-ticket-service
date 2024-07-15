@@ -11,7 +11,7 @@ import (
 
 func main() {
 
-	db.TestPurchase()
+	db.TestPurchase(10)
 
 	lis, err := net.Listen("tcp", pb.SERVER_PORT)
 	if err != nil {

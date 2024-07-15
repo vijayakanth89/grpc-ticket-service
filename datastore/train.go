@@ -26,3 +26,15 @@ func (alloc *Allocations) FindNewSeat() (int, string, error) {
 	}
 	return 0, "", errors.New(ERROR_NO_SEATS)
 }
+
+func (alloc *Allocations) RemoveUser(seatNo int) error {
+	_, exists := alloc.M[seatNo]
+
+	if !exists {
+		return errors.New(ERROR_INVALID_SEAT_NO)
+	}
+
+	alloc.M[seatNo] = "0" // marking as available for allocatin
+
+	return nil
+}

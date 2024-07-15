@@ -20,10 +20,13 @@ var AvailableTrains = []Train{
 }
 
 const (
-	ERROR_NO_SEATS       = "no seats available"
-	INVALID_USER_ID      = "invalid user id"
-	EMPTY_STRING         = "parameter cannot be empty"
-	EMAIL_ERROR_TEMPLATE = "email:'%s', is invalid"
+	ERROR_NO_SEATS                 = "no seats available"
+	ERROR_INVALID_USER_ID          = "invalid user id"
+	ERROR_EMPTY_STRING             = "parameter cannot be empty"
+	ERROR_INVALID_EMAIL_TEMPLATE   = "email:'%s', is invalid"
+	ERROR_INVALID_SEAT_NO          = "invalid seatNo"
+	ERROR_INVALID_SECTION_TEMPLATE = "invalid section: %s"
+	ERROR_INVALID_TICKET_NO        = "invalid ticket number"
 )
 
 const (
@@ -42,8 +45,8 @@ func randomDetails() (string, string, string) {
 	return firstName, lastName, email
 }
 
-func TestPurchase() {
-	for i := 0; i < 10; i++ {
+func TestPurchase(a int) {
+	for i := 0; i < a; i++ {
 		firstName, lastName, email := randomDetails()
 		t, err := PurchaseTicket(firstName, lastName, email, "T001")
 
@@ -54,7 +57,7 @@ func TestPurchase() {
 		}
 	}
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < a; i++ {
 		firstName, lastName, email := randomDetails()
 		t, err := PurchaseTicket(firstName, lastName, email, "T002")
 
